@@ -1,0 +1,22 @@
+﻿<?php
+/**
+ * Implements hook_menu().
+ */
+function pizza_menu() {
+  $items['order-pizza'] = array(
+    'title' => 'Заказать пицу',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('pizza_form'),
+	'menu_name' => 'main-menu',
+	'access callback' => TRUE,
+	'type' => MENU_NORMAL_ITEM,
+   );
+  return $items;
+}
+
+/**
+ * Implements pizza_form().
+ */
+function pizza_form() {
+  	
+}

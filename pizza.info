@@ -1,0 +1,5 @@
+﻿name = Pizza
+description = Форма заказа пицы.
+package = INITLAB
+version = 1.0-dev
+core = 7.x
