@@ -1,0 +1,69 @@
+﻿<?php
+/**
+  * Implement hook_enable()
+  */
+function pizza_enable() {
+  $schema = drupal_get_schema_unprocessed('pizza');
+  //Check if table exists, if not install the schema.
+  foreach ($schema as $name => $table){
+    if(db_table_exists($name) == FALSE) {
+      //drupal_install_schema('pizza');
+	  db_create_table($name, $table);
+    }
+  }
+}
+
+/**
+ * Implement hook_schema()
+ */
+function pizza_schema() {
+  $schema = array();
+    $schema['pizza_type'] = array(
+      'description' => 'pizza type',
+      'fields' => array(
+        'pid' => array(
+          'description' => 'table pid',
+          'type' => 'serial',
+          'not null' => TRUE,
+            ),
+        'piza_name' => array(
+          'type' => 'varchar',
+          'length' => 255,
+        ),
+		'piza_price' => array(
+          'type' => 'varchar',
+          'length' => 255,
+        ),
+      ),
+        'primary key' => array('pid'),
+    );
+
+    $schema['pizza_region'] = array(
+      'description' => 'pizza region',
+      'fields' => array(
+        'rid' => array(
+          'description' => 'table rid',
+          'type' => 'serial',
+          'not null' => TRUE,
+            ),
+        'region_name' => array(
+          'type' => 'varchar',
+          'length' => 255,
+        ),
+		'region_delivery_price' => array(
+          'type' => 'varchar',
+          'length' => 255,
+        ),
+      ),
+        'primary key' => array('rid'),
+    );
+	
+  return $schema;
+}
+
+/**
+  * Implement hook_uninstall()
+  */
+function pizza_uninstall() {
+  drupal_uninstall_schema('pizza');
+}

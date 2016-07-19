@@ -3,20 +3,123 @@
  * Implements hook_menu().
  */
 function pizza_menu() {
+  //Add item to main menu
   $items['order-pizza'] = array(
     'title' => 'Заказать пицу',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('pizza_form'),
+    'page arguments' => array('pizza_order_form'),
 	'menu_name' => 'main-menu',
 	'access callback' => TRUE,
 	'type' => MENU_NORMAL_ITEM,
    );
+   
+   //Add section to configuration page
+   $items['admin/config/pizza-region'] = array(
+    'title' => 'Pizza and Rgion configuration section',
+    'description' => 'This is the parent item',
+    'position' => 'left',
+    'weight' => -100,
+    'page callback' => 'system_admin_menu_block_page',
+    'access arguments' => array('administer site configuration'),
+    'file' => 'system.admin.inc',
+	//'file' => 'pizza.admin.inc',
+    'file path' => drupal_get_path('module', 'system'),
+  );
+  
+  //Pizza confifguration page
+  $items['admin/config/pizza-region/pizza'] = array(
+    'title' => 'Administer pizza',
+    'description' => 'Add/Edit/Delete Pizza',
+	'page callback' => 'drupal_get_form',
+	'page arguments' => array('pizza_list_form'),
+    'access arguments' => array('administer pizza settings'),
+	'file' => 'pizza.admin.inc',
+    'type' => MENU_NORMAL_ITEM,
+   );
+
+  $items['admin/config/pizza-region/pizza/all'] = array(
+    'title' => 'List',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10,
+	'file' => 'pizza.admin.inc',
+  );
+
+  $items['admin/config/pizza-region/pizza/add'] = array(
+    'title' => 'Add new pizza',
+    'type' => MENU_LOCAL_TASK,
+    'page callback' => 'drupal_get_form',
+	'page arguments' => array('pizza_add_form'),
+    'access arguments' => array('administer pizza settings'),
+	'file' => 'pizza.admin.inc',
+  );
+  
+  //Region confifguration page
+  $items['admin/config/pizza-region/region'] = array(
+    'title' => 'Administer regions',
+    'description' => 'Add/Edit/Delete Region',
+	'page callback' => 'drupal_get_form',
+	'page arguments' => array('pizza_region_form'),
+    'access arguments' => array('administer region settings'),
+	'file' => 'pizza.admin.inc',
+    'type' => MENU_NORMAL_ITEM,
+   );
+
+  $items['admin/config/pizza-region/region/all'] = array(
+    'title' => 'List',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10,
+	'file' => 'pizza.admin.inc',
+  );
+
+  $items['admin/config/pizza-region/region/add'] = array(
+    'title' => 'Add new Region',
+    'type' => MENU_LOCAL_TASK,
+    'page callback' => 'drupal_get_form',
+	'page arguments' => array('pizza_regionadd_form'),
+    'access arguments' => array('administer region settings'),
+	'file' => 'pizza.admin.inc',
+  );
+   
   return $items;
 }
 
-/**
- * Implements pizza_form().
- */
-function pizza_form() {
-  //
+function pizza_order_form($form, &$form_state){
+  $form = array();
+  
+  $pizza_query = db_select('pizza_type', 'pt')
+    ->fields('pt', array('pid', 'piza_name', 'piza_price'))
+      ->execute();
+  
+  $region_query = db_select('pizza_region', 'pr')
+    ->fields('pr', array('rid', 'region_name', 'region_delivery_price'))
+      ->execute();
+	  
+  //$record = $results->fetchAssoc();
+  $pizza_name_options = array();
+  while($piza_record = $pizza_query->fetchAssoc()) {
+    //print_r($record);
+	$pid = $piza_record['pid'];
+	$pizza_name = $piza_record['piza_name'];
+	$pizza_price = $piza_record['piza_price'];
+	$pizza_name_options[] = $pizza_name . ' - ' . $pizza_price. ' руб.';
+	//$pizza_name_options[] = $pizza_name => $pizza_price;
+  }
+  
+  $region_name_options = array();
+  while($region_record = $region_query->fetchAssoc()) {
+    //print_r($record);
+	$rid = $region_record['rid'];
+	$region_name = $region_record['region_name'];
+	$region_price = $region_record['region_delivery_price'];
+	$region_name_options[] = $region_name . ' - ' . $region_price. ' руб.';
+  }
+  
+
+  
+  /*$form['name' . $key] = array(
+      '#markup' => $value .'  <br />',
+    );*/
+  
+  
+  return $form;
 }
