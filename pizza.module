@@ -1,5 +1,15 @@
 ﻿<?php
 /**
+ * Implement hook_init()
+ */
+function pizza_init(){
+  drupal_add_js(drupal_get_path('module', 'pizza') . '/pizza.js');
+  $eee = 'Сюда должна попасть общая цена заказа!';
+  drupal_add_js(array('pizza' => array('testvar' => $eee)), array('type' => 'setting'));
+}
+
+
+/**
  * Implements hook_menu().
  */
 function pizza_menu() {
@@ -90,6 +100,9 @@ function pizza_menu() {
   return $items;
 }
 
+/**
+ * Implements pizza_order_form().
+ */
 function pizza_order_form($form, &$form_state){
   $form = array();
   
@@ -158,7 +171,9 @@ function pizza_order_form($form, &$form_state){
   return $form;
 }
 
-
+/**
+ * Implements pizza_order_form_submit().
+ */
 function pizza_order_form_submit($form, $form_state){
   $pizza_name = $form['pizza_name']['#options'][$form_state['values']['pizza_name']];
   
