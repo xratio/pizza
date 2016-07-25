@@ -79,6 +79,13 @@ function pizza_menu() {
     'access arguments' => array('administer region settings'),
 	'file' => 'pizza.admin.inc',
   );
+  
+  $items['order-pizza/calc-price'] = array(
+    'title' => 'Calc total price',
+    'type' => MENU_SUGGESTED_ITEM,
+    'page callback' => 'pizza_calc_total_price',
+	//'page arguments' => array('pizza_regionadd_form')
+  );
    
   return $items;
 }
@@ -107,10 +114,12 @@ function pizza_order_form($form, &$form_state){
 	$region_name[] = $region_record['region_name'];
 	//$region_price[] = $region_record['region_delivery_price'];
   }
+  
+  $type['select'] = array('#input' => TRUE, '#process' => array('expand_radios'));
 
   $form['pizza_name'] = array(
-    '#type' => 'select',
-    '#title' => t('Select pizza'),
+    '#type' => 'radios',
+    '#title' => t('Select Pizza'),
     '#options' => $pizza_name,
     '#description' => t('Select pizza.'),
    );
@@ -134,17 +143,36 @@ function pizza_order_form($form, &$form_state){
     '#description' => t('Select quantity.'),
    );
    
-  $form['region'] = array(
-    '#type' => 'select',
-    '#title' => t('Region'),
-    '#options' => $region_name,
-    '#description' => t('Select region.'),
+  $form['region']   = array(
+    '#type'         => 'select',
+    '#title'        => t('Region'),
+    '#options'      => $region_name,
+    '#description'  => t('Select region.'),
    );
    
-   $form['submit'] = array(
-	  '#type'       => 'submit',
-	  '#value'      => t('Order pizza')
-	);
+   $form['jname'] = array(
+    '#title'    => 'Pizza name',
+	'#type'     => 'textfield',
+	'#required' => TRUE,
+  );
+   
+  $form['submit'] = array(
+    '#type'       => 'submit',
+    '#value'      => t('Order pizza')
+  );
   
   return $form;
+}
+
+
+function pizza_order_form_submit($form, $form_state){
+  $pizza_name = $form['pizza_name']['#options'][$form_state['values']['pizza_name']];
+  
+  // Note: select pizza price by pizza name
+  $query_single = db_select('pizza_type', 'p')
+    ->fields     ('p', array('pid', 'piza_name', 'piza_price'))
+    ->condition  ('p.piza_name', $pizza_name)
+    ->execute();
+  $record    = $query_single->fetchAssoc();
+  //drupal_set_message($record['piza_price']);
 }
