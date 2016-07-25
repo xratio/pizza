@@ -94,18 +94,18 @@ function pizza_order_form($form, &$form_state){
     ->fields('pr', array('rid', 'region_name', 'region_delivery_price'))
       ->execute();
 	  
-  //$pizza_name = array();
+  $pizza_name = array();
   while($piza_record = $pizza_query->fetchAssoc()) {
-	$pid[] = $piza_record['pid'];
+	//$pid[] = $piza_record['pid'];
 	$pizza_name[] = $piza_record['piza_name'];
-	$pizza_price[] = $piza_record['piza_price'];
+	//$pizza_price[] = $piza_record['piza_price'];
   }
   
-  //$region_name = array();
+  $region_name = array();
   while($region_record = $region_query->fetchAssoc()) {
-	$rid[] = $region_record['rid'];
+	//$rid[] = $region_record['rid'];
 	$region_name[] = $region_record['region_name'];
-	$region_price[] = $region_record['region_delivery_price'];
+	//$region_price[] = $region_record['region_delivery_price'];
   }
 
   $form['pizza_name'] = array(
@@ -134,7 +134,7 @@ function pizza_order_form($form, &$form_state){
     '#description' => t('Select quantity.'),
    );
    
-  $form['regionq'] = array(
+  $form['region'] = array(
     '#type' => 'select',
     '#title' => t('Region'),
     '#options' => $region_name,
