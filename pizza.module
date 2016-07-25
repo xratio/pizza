@@ -150,12 +150,6 @@ function pizza_order_form($form, &$form_state){
     '#description'  => t('Select region.'),
    );
    
-   $form['jname'] = array(
-    '#title'    => 'Pizza name',
-	'#type'     => 'textfield',
-	'#required' => TRUE,
-  );
-   
   $form['submit'] = array(
     '#type'       => 'submit',
     '#value'      => t('Order pizza')
