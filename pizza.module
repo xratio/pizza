@@ -86,7 +86,7 @@ function pizza_menu() {
 function pizza_order_form($form, &$form_state){
   $form = array();
   
-  $pizza_query = db_select('pizza_type', 'pt')
+   $pizza_query = db_select('pizza_type', 'pt')
     ->fields('pt', array('pid', 'piza_name', 'piza_price'))
       ->execute();
   
@@ -94,32 +94,57 @@ function pizza_order_form($form, &$form_state){
     ->fields('pr', array('rid', 'region_name', 'region_delivery_price'))
       ->execute();
 	  
-  //$record = $results->fetchAssoc();
-  $pizza_name_options = array();
+  //$pizza_name = array();
   while($piza_record = $pizza_query->fetchAssoc()) {
-    //print_r($record);
-	$pid = $piza_record['pid'];
-	$pizza_name = $piza_record['piza_name'];
-	$pizza_price = $piza_record['piza_price'];
-	$pizza_name_options[] = $pizza_name . ' - ' . $pizza_price. ' руб.';
-	//$pizza_name_options[] = $pizza_name => $pizza_price;
+	$pid[] = $piza_record['pid'];
+	$pizza_name[] = $piza_record['piza_name'];
+	$pizza_price[] = $piza_record['piza_price'];
   }
   
-  $region_name_options = array();
+  //$region_name = array();
   while($region_record = $region_query->fetchAssoc()) {
-    //print_r($record);
-	$rid = $region_record['rid'];
-	$region_name = $region_record['region_name'];
-	$region_price = $region_record['region_delivery_price'];
-	$region_name_options[] = $region_name . ' - ' . $region_price. ' руб.';
+	$rid[] = $region_record['rid'];
+	$region_name[] = $region_record['region_name'];
+	$region_price[] = $region_record['region_delivery_price'];
   }
-  
 
-  
-  /*$form['name' . $key] = array(
-      '#markup' => $value .'  <br />',
-    );*/
-  
+  $form['pizza_name'] = array(
+    '#type' => 'select',
+    '#title' => t('Select pizza'),
+    '#options' => $pizza_name,
+    '#description' => t('Select pizza.'),
+   );
+   
+  $quantity = array(
+    0 => 1,
+    1 => 2,
+    2 => 3,
+    3 => 4,
+    4 => 5,
+    5 => 6,
+    6 => 7,
+    7 => 8,
+    8 => 9,
+    9 => 10,
+    );
+   $form['pizza_q'] = array(
+    '#type' => 'select',
+    '#title' => t('Quantity'),
+    '#options' => $quantity,
+    '#description' => t('Select quantity.'),
+   );
+   
+  $form['regionq'] = array(
+    '#type' => 'select',
+    '#title' => t('Region'),
+    '#options' => $region_name,
+    '#description' => t('Select region.'),
+   );
+   
+   $form['submit'] = array(
+	  '#type'       => 'submit',
+	  '#value'      => t('Order pizza')
+	);
   
   return $form;
 }
