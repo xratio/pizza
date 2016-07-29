@@ -1,15 +1,5 @@
 ﻿<?php
 /**
- * Implement hook_init()
- */
-function pizza_init(){
-  drupal_add_js(drupal_get_path('module', 'pizza') . '/pizza.js');
-  $eee = 'Сюда должна попасть общая цена заказа!';
-  drupal_add_js(array('pizza' => array('testvar' => $eee)), array('type' => 'setting'));
-}
-
-
-/**
  * Implements hook_menu().
  */
 function pizza_menu() {
@@ -106,7 +96,11 @@ function pizza_menu() {
 function pizza_order_form($form, &$form_state){
   $form = array();
   
-   $pizza_query = db_select('pizza_type', 'pt')
+  // A field to output calculated price.
+  $form['price'] = array('#type' => 'markup', '#markup' => '<div id="price"></div>');
+  
+  $js_settings = array();
+  $pizza_query = db_select('pizza_type', 'pt')
     ->fields('pt', array('pid', 'piza_name', 'piza_price'))
       ->execute();
   
@@ -116,17 +110,32 @@ function pizza_order_form($form, &$form_state){
 	  
   $pizza_name = array();
   while($piza_record = $pizza_query->fetchAssoc()) {
-	//$pid[] = $piza_record['pid'];
-	$pizza_name[] = $piza_record['piza_name'];
-	//$pizza_price[] = $piza_record['piza_price'];
+	$pizza_name[$piza_record['pid']] = $piza_record['piza_name'] . ' - ' . $piza_record['piza_price'] . ' руб.';
+	$js_settings['price'][$piza_record['pid']] = $piza_record['piza_price'];
   }
   
   $region_name = array();
   while($region_record = $region_query->fetchAssoc()) {
-	//$rid[] = $region_record['rid'];
-	$region_name[] = $region_record['region_name'];
-	//$region_price[] = $region_record['region_delivery_price'];
+	$region_name[$region_record['rid']] = $region_record['region_name'] . ' - ' . $region_record['region_delivery_price'] . ' руб.';
+	$js_settings['delivery'][$region_record['rid']] = $region_record['region_delivery_price'];
   }
+  
+  $quantity = array(
+    1 => 1,
+    2 => 2,
+    3 => 3,
+    4 => 4,
+    5 => 5,
+    6 => 6,
+    7 => 7,
+    8 => 8,
+    9 => 9,
+    10 => 10,
+    );
+  $js_settings['quantity'] = $quantity;
+  
+  // Add module settings to Drupal.settings JS global variable.
+  drupal_add_js(array('pizza' => $js_settings), 'setting');
   
   $type['select'] = array('#input' => TRUE, '#process' => array('expand_radios'));
 
@@ -136,20 +145,8 @@ function pizza_order_form($form, &$form_state){
     '#options' => $pizza_name,
     '#description' => t('Select pizza.'),
    );
-   
-  $quantity = array(
-    0 => 1,
-    1 => 2,
-    2 => 3,
-    3 => 4,
-    4 => 5,
-    5 => 6,
-    6 => 7,
-    7 => 8,
-    8 => 9,
-    9 => 10,
-    );
-   $form['pizza_q'] = array(
+
+  $form['pizza_q'] = array(
     '#type' => 'select',
     '#title' => t('Quantity'),
     '#options' => $quantity,
@@ -162,6 +159,11 @@ function pizza_order_form($form, &$form_state){
     '#options'      => $region_name,
     '#description'  => t('Select region.'),
    );
+   
+  // Attach JS-file to form.
+  $form['#attached']['js'] = array(
+    drupal_get_path('module', 'pizza') . '/js/pizza.js',
+  );
    
   $form['submit'] = array(
     '#type'       => 'submit',
@@ -184,4 +186,28 @@ function pizza_order_form_submit($form, $form_state){
     ->execute();
   $record    = $query_single->fetchAssoc();
   //drupal_set_message($record['piza_price']);
+}
+
+/**
+ * Implements pizza_order_form_callback().
+ */
+function pizza_order_form_callback($form, &$form_state){
+  $form_state['rebuild'] = TRUE;
+  /*$pizza_name = $form['pizza_name']['#options'][$form_state['values']['pizza_name']];
+  
+  // Note: select pizza price by pizza name
+  $query_single = db_select('pizza_type', 'p')
+    ->fields     ('p', array('pid', 'piza_name', 'piza_price'))
+    ->condition  ('p.piza_name', $pizza_name)
+    ->execute();
+  $record    = $query_single->fetchAssoc();*/
+  
+  $form['total_price']['#markup'] = "AA";
+  $form['submit']['#value'] = "Order pizza";
+  
+  $commands = array();
+  $commands[] = ajax_command_replace(".total_price", render($form['total_price']));
+  $commands[] = ajax_command_replace(".order", render($form['submit']));
+  $form = array ('#type' => 'ajax', '#commands' => $commands);
+  return $form;
 }
