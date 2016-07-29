@@ -19,7 +19,7 @@ Drupal.behaviors.pizza = {
       // Gep price from Drupal settings.
       var price = Drupal.settings.pizza.price[pid];
 	  pricee = price;
-	  price = (parseInt(delivery_pricee) + parseInt(pricee)) * parseInt(quantityy);
+	  price = (parseInt(quantityy) * parseInt(pricee)) + parseInt(delivery_pricee);
       $('#price').html('Price: ' + price);
     });
 	
@@ -29,7 +29,7 @@ Drupal.behaviors.pizza = {
       // Gep price from Drupal settings.
       var delivery_price = Drupal.settings.pizza.delivery[rid];
 	  delivery_pricee = delivery_price;
-	  delivery_price = (parseInt(delivery_pricee) + parseInt(pricee)) * parseInt(quantityy);
+	  delivery_price = (parseInt(quantityy) * parseInt(pricee)) + parseInt(delivery_pricee);
 	  $('#price').html('Price: ' + delivery_price);
     });
 	
@@ -39,7 +39,7 @@ Drupal.behaviors.pizza = {
       // Gep price from Drupal settings.
       var quantity = Drupal.settings.pizza.quantity[qid];
 	  quantityy = quantity;
-	  quantity = (parseInt(delivery_pricee) + parseInt(pricee)) * parseInt(quantityy);
+	  quantity = (parseInt(quantityy) * parseInt(pricee)) + parseInt(delivery_pricee);
 	  $('#price').html('Price: ' + quantity);
     });
   }
